@@ -15,10 +15,14 @@ Requirements: jq and curl
       -r, --reconfigure               Remove config file and ask for API key/models directory
 
 ## Installation
+
 Download the raw bash, mark as executable, and copy it to sompleace in your PATH. e.g:
 
     chmod +x civit_download.sh
     cp civit_download.sh /usr/local/bin/civit_download
 
-##TODO
-Embeddings, VAEs, other things?
+## TODO
+
+* Embeddings, VAEs, other things?
+* specify subfolder as flag for checkpoint version download
+* flag to not rename file

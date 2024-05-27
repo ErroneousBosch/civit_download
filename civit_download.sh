@@ -66,7 +66,7 @@ fi
 source $CONFIG_FILE
 
 CIVIT_API_URL="https://civitai.com/api/v1"
-model_metatypes=("character" "style" "celebrity" "concept" "base model" "poses" "background" "tool" "buildings" "vehicle" "objects" "animal" "action" "assets")
+model_metatypes=("character" "style" "clothing" "celebrity" "concept" "base model" "poses" "background" "tool" "buildings" "vehicle" "objects" "animal" "action" "assets")
 
 if [[ $mode == "models" ]]; then
   echo "Selected mode: model"

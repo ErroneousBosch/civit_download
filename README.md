@@ -2,7 +2,11 @@
 
 This is a simple bash script for downloading Civit LORAs, Embeddings and Checkpoints into your Fooocus directories. It also tries to organize them in a senible way for use in the application, because the default names are generally unusable:
 
-LORAs are classified by their top level tag (style, character, etc.), then a subdirectory for the Model name, and the model file itself is renamed to the version name. Checkpoints will ask you for a subdirectory, but are otherwise named the same way.
+LORAs are classified by their top level tag (style, character, etc.) and put under a subdirectory based on that,, then a subdirectory for the Model name, and the model file itself is renamed to the version name. Using the `-n|--no-rename` flag will keep the filename to make inline loading work more as expected.
+
+Checkpoints will ask you for a classification subdirectory, but are otherwise named the same way. You can define the classification subdirectory using the `-s|--subdir` flag.
+
+Embeddings do not have classification subdirectories.
 
 It stores your API key and models directory in `~/.civitai/download.config`
 

@@ -1,6 +1,6 @@
 # Civit Downloader
 
-This is a simple bash script for downloading Civit LORAs and Checkpoints into your Fooocus directories. It also tries to organize them in a senible way for use in the application, because the default names are generally unusable:
+This is a simple bash script for downloading Civit LORAs, Embeddings and Checkpoints into your Fooocus directories. It also tries to organize them in a senible way for use in the application, because the default names are generally unusable:
 
 LORAs are classified by their top level tag (style, character, etc.), then a subdirectory for the Model name, and the model file itself is renamed to the version name. Checkpoints will ask you for a subdirectory, but are otherwise named the same way.
 
@@ -13,6 +13,7 @@ Requirements: jq and curl
       -m, --model <modelID>           Download model files
       -v, --modelversion <versionID>  Download model version file
       -r, --reconfigure               Remove config file and ask for API key/models directory
+      -n, --no-rename                 Do not rename downloaded files
 
 ## Installation
 
@@ -23,6 +24,6 @@ Download the raw bash, mark as executable, and copy it to sompleace in your PATH
 
 ## TODO
 
-* Embeddings, VAEs, other things?
+* Other things?
 * specify subfolder as flag for checkpoint version download
 * flag to not rename file

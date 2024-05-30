@@ -14,6 +14,7 @@ Requirements: jq and curl
       -v, --modelversion <versionID>  Download model version file
       -r, --reconfigure               Remove config file and ask for API key/models directory
       -n, --no-rename                 Do not rename downloaded files
+      -s, --subdir <subdir>           Specify subdirectory for model files underneath type directory
 
 ## Installation
 

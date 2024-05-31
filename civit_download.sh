@@ -26,6 +26,10 @@ for ((i=0; i<$model_versions_count; i++)); do
       
       newfilename
 
+      if [[ $SKIPIFEXIST == true && -f "$target_dir/$safe_file_name" ]]; then
+        echo "File already exists: $safe_file_name"
+        continue
+      fi
       # Download the file
       echo "Downloading Version '$version_name' as '$safe_file_name' "
       curl -L -o "$target_dir/$safe_file_name" -H "Authorization: Bearer $api_key" "$file_url"
@@ -34,7 +38,14 @@ for ((i=0; i<$model_versions_count; i++)); do
         continue
       fi
       echo "File downloaded: $safe_file_name"
+      makelink
     done
+}
+
+makelink () {
+  if [[ $LINK == true ]]; then
+    ln -s "$target_dir/$safe_file_name" "$target_dir/$file_name"
+  fi
 }
 
 newfilename () {
@@ -67,8 +78,17 @@ getmetatype () {
   # Ask user for model metatype
 
 }
+skipcheck () {
+  if [[ $SKIPIFEXIST == true && -f "$target_dir/$safe_file_name" ]]; then
+    echo "File already exists: $safe_file_name"
+    exit 0
+  fi
+}
 
 defined_mt=false
+NO_RENAME=false
+LINK=false
+SKIPIFEXIST=false
 while [[ $# -gt 0 ]]; do
   key="$1"
   case $key in
@@ -94,6 +114,13 @@ while [[ $# -gt 0 ]]; do
       model_metatype="$1"
       defined_mt=true
       ;;
+    -k| --skip)
+      SKIPIFEXIST=true
+      ;;
+    -l| --link)
+      LINK=true
+      NO_RENAME=false
+      ;;
     *)
       echo "Unknown option: $key"
       exit 1
@@ -111,6 +138,9 @@ Options:
   -r, --reconfigure               Reconfigure the download script
   -n, --no-rename                 Do not rename downloaded files
   -s, --subdir <subdir>           Specify subdirectory for model files underneath type directory
+  -k, --skip                      Skip downloading if file already exists in target directory
+  -l, --link                      Create a symbolic link to the downloaded file with original 
+                                  filename, useful when the filename isn't descriptive enough
 
   Configuration: options are stored in $CONFIG_FILE
 "
@@ -239,6 +269,7 @@ if [[ $mode == "models" ]]; then
 
     newfilename
 
+    skipcheck
     # Download the file
     echo "Downloading Version '$version_name' as '$safe_file_name' "
     curl -L -o "$target_dir/$safe_file_name" -H "Authorization: Bearer $api_key" "$file_url"
@@ -247,6 +278,7 @@ if [[ $mode == "models" ]]; then
       exit 1
     fi
     echo "File downloaded: $safe_file_name"
+    makelink
     fi
 
   
@@ -306,11 +338,9 @@ elif [[ $mode == "model-versions" ]]; then
       exit 1
     fi
     echo "Target Directory: $target_dir"
-    # Make the version_name filename safe
-    safe_version_name=$(echo "$version_name" | tr ' ' '_'| tr -dc '[:alnum:]\n\r_')
-    # Get the file extension from file_name
-    file_extension="${file_name##*.}"
-    safe_version_name="$safe_version_name.$file_extension"
+    newfilename
+
+    skipcheck
     # Download the file
     echo "Downloading Version '$version_name' as '$safe_version_name' "
     curl -L -o "$target_dir/$safe_version_name" -H "Authorization: Bearer $api_key" "$file_url"
@@ -319,6 +349,7 @@ elif [[ $mode == "model-versions" ]]; then
       exit 1
     fi
     echo "File downloaded: $safe_version_name"
+    makelink
 
   elif [[ $model_type == "Checkpoint" ]]; then
     model_type="checkpoints"
@@ -345,6 +376,7 @@ elif [[ $mode == "model-versions" ]]; then
       echo "Failed to create target directory: $target_dir"
       exit 1
     fi
+    skipcheck
     # Download the file
     echo "Downloading Version '$version_name' as '$safe_version_name' "
     curl -L -o "$target_dir/$safe_version_name" -H "Authorization: Bearer $api_key" "$file_url"
@@ -353,6 +385,7 @@ elif [[ $mode == "model-versions" ]]; then
       exit 1
     fi
     echo "File downloaded: $safe_version_name"
+    makelink
   elif [[ $model_type == "TextualInversion" ]]; then
     model_type="embeddings"
     parent=$(curl -s -L "$CIVIT_API_URL/models/$model_id")
@@ -396,7 +429,7 @@ elif [[ $mode == "model-versions" ]]; then
       exit 1
     fi
     echo "File downloaded: $safe_version_name"
-
+    makelink
   else
     echo "Unknown Model Type"
   fi

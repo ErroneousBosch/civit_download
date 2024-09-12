@@ -65,7 +65,7 @@ getmetatype () {
     if [[ $model_type == "loras" || $model_type == "embeddings" ]]; then
       model_metatype="unknown"
       for metatype in "${model_metatypes[@]}"; do
-        if echo "$response" | jq -r '.tags[]' | grep -q "$metatype"; then
+        if echo "$parent" | jq -r '.tags[]' | grep -q "$metatype"; then
           model_metatype="$metatype"
           break
         fi

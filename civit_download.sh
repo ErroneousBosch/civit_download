@@ -342,13 +342,13 @@ elif [[ $mode == "model-versions" ]]; then
 
     skipcheck
     # Download the file
-    echo "Downloading Version '$version_name' as '$safe_version_name' "
-    curl -L -o "$target_dir/$safe_version_name" -H "Authorization: Bearer $api_key" "$file_url"
+    echo "Downloading Version '$version_name' as '$safe_file_name' "
+    curl -L -o "$target_dir/$safe_file_name" -H "Authorization: Bearer $api_key" "$file_url"
     if [[ $? -ne 0 ]]; then
       echo "Failed to download file: $file_name"
       exit 1
     fi
-    echo "File downloaded: $safe_version_name"
+    echo "File downloaded: $safe_file_name"
     makelink
 
   elif [[ $model_type == "Checkpoint" ]]; then

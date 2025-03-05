@@ -177,6 +177,7 @@ if [[ $mode == "models" ]]; then
   model_type=$(echo "$response" | jq -r '.type')
   if [[ $model_type == "LORA" || $model_type == "LoCon" ]]; then
     model_type="loras"
+    parent=$response
     getmetatype
     echo "Model Name: $model_name"
     echo "Model Type: $model_type"

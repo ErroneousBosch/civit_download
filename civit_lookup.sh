@@ -34,6 +34,7 @@ getmetatype () {
 
 
 defined_mt=false
+num_results=10
 # NO_RENAME=false
 # LINK=false
 # SKIPIFEXIST=false
@@ -54,12 +55,41 @@ while [[ $# -gt 0 ]]; do
       rm -f $CONFIG_FILE
       echo "Configuration file removed."
       ;;
-    # -n| --no-rename)
-    #   NO_RENAME=true
-    #   ;;
-    -s| --subdir)
+    -n| --numresults)
+      shift
+      num_results="$1"
+      ;;
+    -s| --search)
+      shift
+      query="$1"
+      mode="search"
+      ;;
+    -sd | --sort-downloaded)
+      sort="Most%20Downloaded"
+      ;;
+    -sr | --sort-rated)
+      sort="Highest%20Rated"
+      ;;
+    -sn | --sort-newest)
+      sort="Newest"
+      ;;
+    -mt | --metatype)
+      defined_mt=true
       shift
       model_metatype="$1"
+      #check if metatype is valid valid types: Checkpoint, TextualInversion, Hypernetwork, AestheticGradient, LORA, Controlnet, Poses
+      model_metatypes=("Checkpoint" "TextualInversion" "Hypernetwork" "AestheticGradient" "LORA" "Controlnet" "Poses")
+      valid_metatype=false
+      for metatype in "${model_metatypes[@]}"; do
+        if [[ $model_metatype == $metatype ]]; then
+        valid_metatype=true
+          break
+        fi
+      done
+      if [[ $valid_metatype == false ]]; then
+        echo "Invalid metatype. Valid metatypes are: Checkpoint, TextualInversion, Hypernetwork, AestheticGradient, LORA, Controlnet, Poses"
+        exit 1
+      fi 
       defined_mt=true
       ;;
     # -k| --skip)
@@ -269,31 +299,6 @@ elif [[ $mode == "model-versions" ]]; then
       echo "No primary file found for model version $version_name."
       exit 1
     fi
-    # file_name=$(echo "$version_files" | jq -r '.name')
-    # file_url=$(echo "$version_files" | jq -r '.downloadUrl')
-
-    # Make the model_name filename safe
-    # safe_model_name=$(echo "$model_name" | tr ' ' '_'| tr -dc '[:alnum:]\n\r_')
-    # Create the target directory
-    # target_dir="$models_dir/$model_type/$model_metatype/$safe_model_name"
-    # mkdir -p "$target_dir"
-    # if [[ $? -ne 0 ]]; then
-    #   echo "Failed to create target directory: $target_dir"
-    #   exit 1
-    # fi
-    # echo "Target Directory: $target_dir"
-    # newfilename
-
-    # skipcheck
-    # Download the file
-    # echo "Downloading Version '$version_name' as '$safe_file_name' "
-    # curl -L -o "$target_dir/$safe_file_name" -H "Authorization: Bearer $api_key" "$file_url"
-    # if [[ $? -ne 0 ]]; then
-    #   echo "Failed to download file: $file_name"
-    #   exit 1
-    # fi
-    # echo "File downloaded: $safe_file_name"
-    # makelink
 
   elif [[ $model_type == "Checkpoint" ]]; then
     model_type="checkpoints"
@@ -303,33 +308,7 @@ elif [[ $mode == "model-versions" ]]; then
       echo "No primary file found for model version $version_name."
       exit 1
     fi
-    # file_name=$(echo "$version_files" | jq -r '.name')
-    # file_url=$(echo "$version_files" | jq -r '.downloadUrl')
-    # Make the model_name filename safe
-    # safe_model_name=$(echo "$model_name" | tr ' ' '_'| tr -dc '[:alnum:]\n\r_')
-    # Make the version_name filename safe
-    # safe_version_name=$(echo "$version_name" | tr ' ' '_'| tr -dc '[:alnum:]\n\r_')
-    # Get the file extension from file_name
-    # file_extension="${file_name##*.}"
-    # safe_version_name="$safe_version_name.$file_extension"
     getmetatype
-    # Create the target directory
-    # target_dir="$models_dir/$model_type/$model_metatype/$safe_model_name"
-    # mkdir -p "$target_dir"
-    # if [[ $? -ne 0 ]]; then
-    #   echo "Failed to create target directory: $target_dir"
-    #   exit 1
-    # fi
-    # skipcheck
-    # # Download the file
-    # echo "Downloading Version '$version_name' as '$safe_version_name' "
-    # curl -L -o "$target_dir/$safe_version_name" -H "Authorization: Bearer $api_key" "$file_url"
-    # if [[ $? -ne 0 ]]; then
-    #   echo "Failed to download file: $file_name"
-    #   exit 1
-    # fi
-    # echo "File downloaded: $safe_version_name"
-    # makelink
   elif [[ $model_type == "TextualInversion" ]]; then
     model_type="embeddings"
     parent=$(curl -s -L "$CIVIT_API_URL/models/$model_id")
@@ -347,35 +326,42 @@ elif [[ $mode == "model-versions" ]]; then
       echo "No primary file found for model version $version_name."
       exit 1
     fi
-    # file_name=$(echo "$version_files" | jq -r '.name')
-    # file_url=$(echo "$version_files" | jq -r '.downloadUrl')
-
-    # Make the model_name filename safe
-    # safe_model_name=$(echo "$model_name" | tr ' ' '_'| tr -dc '[:alnum:]\n\r_')
-    # Create the target directory
-    # target_dir="$models_dir/$model_type/$model_metatype/$safe_model_name"
-    # mkdir -p "$target_dir"
-    # if [[ $? -ne 0 ]]; then
-    #   echo "Failed to create target directory: $target_dir"
-    #   exit 1
-    # fi
-    # echo "Target Directory: $target_dir"
-    # # Make the version_name filename safe
-    # safe_version_name=$(echo "$version_name" | tr ' ' '_'| tr -dc '[:alnum:]\n\r_')
-    # # Get the file extension from file_name
-    # file_extension="${file_name##*.}"
-    # safe_version_name="$safe_version_name.$file_extension"
-    # # Download the file
-    # echo "Downloading Version '$version_name' as '$safe_version_name' "
-    # curl -L -o "$target_dir/$safe_version_name" -H "Authorization: Bearer $api_key" "$file_url"
-    # if [[ $? -ne 0 ]]; then
-    #   echo "Failed to download file: $file_name"
-    #   exit 1
-    # fi
-    # echo "File downloaded: $safe_version_name"
-    # makelink
   else
     echo "Unknown Model Type"
   fi
+
+elif [[ $mode == "search" ]]; then
+  echo "Selected mode: search"
+  curlstr="$CIVIT_API_URL/models?query=$query"
+  addecho=""
+  if [[ $defined_mt == true ]]; then
+    curlstr="$curlstr&types=$model_metatype"
+    addecho="$addecho of metatype: $model_metatype"
+  fi
+  if [[ -n $sort ]]; then
+    curlstr="$curlstr&sort=$sort"
+    addecho="$addecho sorted by ${sort//%20/ }"
+  fi
+
+  response=$(curl -s -L "$curlstr")
+  items=$(echo "$response" | jq -r '.items[] | .name, .id, .type')
+  if [[ -z $items ]]; then
+    echo "No results found for query: $query"
+    exit 1
+  fi
+  echo "Top $num_results search results for query: '$query'"
+  echo "$addecho"
+  for ((i=0; i<$num_results; i++)); do
+    model_id=$(echo "$response" | jq -r ".items[$i].id")
+    if [[ $model_id == "null" ]]; then
+      echo "No more results found."
+      break
+    fi
+    model_name=$(echo "$response" | jq -r ".items[$i].name")
+    model_type=$(echo "$response" | jq -r ".items[$i].type")
+    getmetatype
+
+    echo "[$i] $model_name (ID: $model_id, Type: $model_type)"
+  done
 
 fi
